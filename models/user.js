@@ -1,4 +1,5 @@
 const { DataTypes } = require('sequelize')
+const bcrypt = require('bcryptjs')
 
 const sequelize = require('../lib/sequelize')
 const { Photo } = require('./photo')
@@ -9,7 +10,7 @@ const User = sequelize.define('user', {
     userId: { type: DataTypes.INTEGER, allowNull: false },
     name: { type: DataTypes.STRING, allowNull: false },
     email: { type: DataTypes.STRING, allowNull: false },
-    password: { type: DataTypes.STRING, set(value) { this.setDataValue('password', hash(value)) }, allowNull: false },
+    password: { type: DataTypes.STRING, set(value) { this.setDataValue('password', bcrypt.hash(value, 8)) }, allowNull: false },
     admin: { type: DataTypes.BOOLEAN, allowNull: false }
 })
 

@@ -1,37 +1,14 @@
 const { Router } = require('express')
 const jwt = require('jsonwebtoken')
+const { requireAuth, generateAuthToken } = require('../lib/auth')
+const { User, UserClientFields } = require('../models/user')
+const { ValidationError } = require('sequelize')
 
 const { Business } = require('../models/business')
 const { Photo } = require('../models/photo')
 const { Review } = require('../models/review')
 
 const router = Router()
-
-/*
- * Function to require authentication
- */
-function requireAuth(req, res, next) {
-  // Get the token from the header
-  const auth_header = req.get('Authorization') || '';
-  const auth_token = auth_header.split(' ')[1];
-
-  try {
-    jwt.verify(auth_token, process.env.JWT_SECRET);
-    req.user = payload.sub;
-    next();
-  } catch (err) {
-    res.status(401).json({ error: 'Unauthorized' })
-  }
-}
-
-
-/*
- * Function to generate Auth token
- */
-function generateAuthToken(user) {
-  const payload = { "sub": user };
-  return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '24h' });
-}
 
 /*
  * Route to create a new user.
@@ -55,7 +32,8 @@ router.post('/users', async function (req, res, next) {
 
 router.post('/users/login', async function (req, res, next) {
   const user = await User.findOne({ where: { email: req.body.email }})
-  if (user && user.password === hash(req.body.password)) {
+  const authenticated = await bcrypt.compare(req.body.password, user.password)
+  if (authenticated) {
     const token = generateAuthToken(user.userId)
     res.status(200).json({ "token": token })
   } else {

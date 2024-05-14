@@ -1,5 +1,6 @@
 const { Router } = require('express')
 const { ValidationError } = require('sequelize')
+const { requireAuth } = require('../lib/auth')
 
 const { Photo, PhotoClientFields } = require('../models/photo')
 
@@ -8,7 +9,7 @@ const router = Router()
 /*
  * Route to create a new photo.
  */
-router.post('/', async function (req, res, next) {
+router.post('/', requireAuth, async function (req, res, next) {
   try {
     const photo = await Photo.create(req.body, PhotoClientFields)
     res.status(201).send({ id: photo.id })
@@ -37,7 +38,7 @@ router.get('/:photoId', async function (req, res, next) {
 /*
  * Route to update a photo.
  */
-router.patch('/:photoId', async function (req, res, next) {
+router.patch('/:photoId', requireAuth, async function (req, res, next) {
   const photoId = req.params.photoId
 
   /*
@@ -59,7 +60,7 @@ router.patch('/:photoId', async function (req, res, next) {
 /*
  * Route to delete a photo.
  */
-router.delete('/:photoId', async function (req, res, next) {
+router.delete('/:photoId', requireAuth, async function (req, res, next) {
   const photoId = req.params.photoId
   const result = await Photo.destroy({ where: { id: photoId }})
   if (result > 0) {
