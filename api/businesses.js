@@ -57,6 +57,11 @@ router.get('/', async function (req, res) {
  * Route to create a new business.
  */
 router.post('/', requireAuth,  async function (req, res, next) {
+  const ownerId = parstInt(req.body.userId)
+  if (ownerId !== req.user || !req.user.isAdmin) {
+    res.status(403).send({ error: 'Unauthorized' })
+    return
+  }
   try {
     const business = await Business.create(req.body, BusinessClientFields)
     res.status(201).send({ id: business.id })
@@ -89,6 +94,11 @@ router.get('/:businessId', async function (req, res, next) {
  */
 router.patch('/:businessId', requireAuth, async function (req, res, next) {
   const businessId = req.params.businessId
+  const ownerId = parseInt(req.body.userId)
+  if (ownerId !== req.user || !req.user.isAdmin) {
+    res.status(403).send({ error: 'Unauthorized' })
+    return
+  }
   const result = await Business.update(req.body, {
     where: { id: businessId },
     fields: BusinessClientFields
@@ -105,6 +115,11 @@ router.patch('/:businessId', requireAuth, async function (req, res, next) {
  */
 router.delete('/:businessId', requireAuth, async function (req, res, next) {
   const businessId = req.params.businessId
+  const ownerId = parseInt(req.body.userId)
+  if (ownerId !== req.user || !req.user.isAdmin) {
+    res.status(403).send({ error: 'Unauthorized' })
+    return
+  }
   const result = await Business.destroy({ where: { id: businessId }})
   if (result > 0) {
     res.status(204).send()

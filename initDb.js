@@ -14,9 +14,17 @@ const photoData = require('./data/photos.json')
 const reviewData = require('./data/reviews.json')
 const userData = require('./data/users.json')
 
+const adminUser = {
+  "name": 'admin',
+  "email": 'admin@admin.com',
+  "password": 'hunter2',
+  "isAdmin": true
+}
+
 sequelize.sync().then(async function () {
   await Business.bulkCreate(businessData, { fields: BusinessClientFields })
   await Photo.bulkCreate(photoData, { fields: PhotoClientFields })
   await Review.bulkCreate(reviewData, { fields: ReviewClientFields })
+  await User.create(adminUser, { fields: UserClientFields })
   await User.bulkCreate(userData, { fields: UserClientFields })
 })

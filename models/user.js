@@ -11,7 +11,7 @@ const User = sequelize.define('user', {
     name: { type: DataTypes.STRING, allowNull: false },
     email: { type: DataTypes.STRING, allowNull: false },
     password: { type: DataTypes.STRING, set(value) { this.setDataValue('password', bcrypt.hash(value, 8)) }, allowNull: false },
-    admin: { type: DataTypes.BOOLEAN, allowNull: false }
+    isAdmin: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false}
 })
 
 User.hasMany(Business, { foreignKey: { allowNull: false } })

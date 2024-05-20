@@ -10,6 +10,11 @@ const router = Router()
  * Route to create a new photo.
  */
 router.post('/', requireAuth, async function (req, res, next) {
+  const ownerId = parseInt(req.body.userId)
+  if (req.user !== ownerId || !req.user.isAdmin) {
+    res.status(403).send({ error: 'Forbidden' })
+    return
+  }
   try {
     const photo = await Photo.create(req.body, PhotoClientFields)
     res.status(201).send({ id: photo.id })
@@ -26,6 +31,11 @@ router.post('/', requireAuth, async function (req, res, next) {
  * Route to fetch info about a specific photo.
  */
 router.get('/:photoId', async function (req, res, next) {
+  const ownerId = parseInt(req.body.userId)
+  if (req.user !== ownerId || !req.user.isAdmin) {
+    res.status(403).send({ error: 'Forbidden' })
+    return
+  }
   const photoId = req.params.photoId
   const photo = await Photo.findByPk(photoId)
   if (photo) {
@@ -39,6 +49,11 @@ router.get('/:photoId', async function (req, res, next) {
  * Route to update a photo.
  */
 router.patch('/:photoId', requireAuth, async function (req, res, next) {
+  const ownerId = parseInt(req.body.userId)
+  if (req.user !== ownerId || !req.user.isAdmin) {
+    res.status(403).send({ error: 'Forbidden' })
+    return
+  }
   const photoId = req.params.photoId
 
   /*
@@ -61,6 +76,12 @@ router.patch('/:photoId', requireAuth, async function (req, res, next) {
  * Route to delete a photo.
  */
 router.delete('/:photoId', requireAuth, async function (req, res, next) {
+  const ownerId = parseInt(req.body.userId)
+  if (req.user !== ownerId || !req.user.isAdmin) {
+    res.status(403).send({ error: 'Forbidden' })
+    return
+  }
+
   const photoId = req.params.photoId
   const result = await Photo.destroy({ where: { id: photoId }})
   if (result > 0) {
